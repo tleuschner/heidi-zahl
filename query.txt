@@ -1,0 +1,6 @@
+CALL apoc.periodic.iterate(
+"call apoc.load.json('http://localhost:3000/movies') yield value as m",
+"merge (movie:Movie {id: m.title}) ON CREATE SET movie.title = m.title
+foreach (c in m.cast | MERGE (cast: Cast {name: c}) MERGE (cast)-[:ACTS_IN]->(movie))", 
+{ batchSize:500, parallel:true}
+) YIELD batches, total RETURN batches, total
